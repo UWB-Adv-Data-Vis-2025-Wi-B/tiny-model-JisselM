@@ -149,3 +149,31 @@ summary.lm(cut_lm)
 ```
 
 Based on the scatter plot, as the weight of the diamond increases by 1 carat, diamond price increases by about 7871 USD. There is a price difference of about 1120 from fair to good, 1510 from fair to very good, 1439 from fair to premium, and 1800 from fair to ideal. This model accounts for about 85% of the variance in the data. 
+
+## Interactions between carat and cut in diamonds
+
+```{r cut histogram, echo = FALSE}
+summary(diamonds)
+ggplot(diamonds, aes(x = price, fill = cut)) + 
+  geom_histogram(position = 'identity', alpha = 0.7, bins = 8) + 
+  ggtitle("Distribution of the price range of diamonds") + 
+  xlab('diamond price')
+```
+
+Diamond cuts may be more prevalent in different carats, so the interaction of these two variables may potentially affect price. 
+
+```{r diamondInteractions, echo = FALSE}
+ggplot(diamonds, aes(x = carat, y = price, color = cut)) + 
+  geom_point() +
+  geom_smooth(method = 'lm') + 
+  ggtitle("Plot of carat and diamond price for five cut variations") + 
+  ylab('Price (USD)') + 
+  xlab('Carat(s)')
+
+cut_x_carat_lm <- lm(price ~ carat + cut + carat:cut, diamonds)
+summary.lm(cut_x_carat_lm)
+
+anova(cut_lm, cut_x_carat_lm)
+```
+
+The cut-specific model and cut-carat interaction model are statistically significantly different with a p-value less than 0.05. Therefore, we can rely on the cut-carat interaction model for prediction about diamond prices in USD.
