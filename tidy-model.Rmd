@@ -132,3 +132,20 @@ summary.lm(carat_lm)
 
 Based on the scatter plot, as the weight of the diamond increases by 1 carat, diamond price increases by about 7756 USD. 
 
+## cut-specific effects of carat(s) on price
+
+```{r cut, echo= FALSE}
+ggplot(diamonds, aes(x = carat, y = price, color = cut)) +
+  geom_point() + 
+  geom_smooth(method = 'lm') +
+  ggtitle("Plot of carat and diamond price for five cuts of diamond") +
+  ylab('Price (in USD)') +
+  xlab('Carat(s)')
+  
+contrasts(diamonds$cut) <- contr.treatment(5)
+cut_lm <- lm(price ~ carat + cut, diamonds)
+
+summary.lm(cut_lm)
+```
+
+Based on the scatter plot, as the weight of the diamond increases by 1 carat, diamond price increases by about 7871 USD. There is a price difference of about 1120 from fair to good, 1510 from fair to very good, 1439 from fair to premium, and 1800 from fair to ideal. This model accounts for about 85% of the variance in the data. 
