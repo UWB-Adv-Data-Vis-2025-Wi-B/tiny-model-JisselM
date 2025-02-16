@@ -67,4 +67,31 @@ species_lm <- lm(rate ~ temp + species, crickets)
 summary.lm(species_lm)
 ```
 
-Based on the scatter plot of temperature, chirping, species, and a correlation test, it seems that as temperature increases one degree, the rate of chirping increases about 3.6 chirps per minute. O. exclamationis has a chirp rate 10 chirps per minute higher than O. niveus. Additionally, the model accounts for about 99 percent of the variance in the data. 
+Based on the scatter plot of temperature, chirping, species, and a correlation test, it seems that as temperature increases one degree, the rate of chirping increases about 3.6 chirps per minute. O. exclamationis has a chirp rate 10 chirps per minute higher than O. niveus. Additionally, the model accounts for about 99% of the variance in the data. 
+
+## Interactions
+
+```{r species histogram, echo = FALSE}
+ggplot(crickets, aes(x = rate, fill = species)) + 
+  geom_histogram(position = 'identity', alpha = 0.7, bins = 8) + 
+  ggtitle("Distribution of the chirp rate of crickets") + 
+  xlab('Chirp rate (per min.)')
+```
+
+The O. exclamationis and O. niveus species occupy different temperature zones, which potentially impacts chirp rate.
+
+```{r interactions, echo = FALSE}
+ggplot(crickets, aes(x = temp, y = rate, color = species)) + 
+  geom_point() + 
+  geom_smooth(method = 'lm') + 
+  ggtitle("Plot of temperature and chirp rate for two species of crickets") + 
+  ylab('Chirp rate (per min.)') + 
+  xlab('Temperature (Celcius)')
+
+species_x_temp_lm <- lm(rate ~ temp + species + temp:species, crickets)
+summary.lm(species_x_temp_lm)
+
+anova(species_lm, species_x_temp_lm)
+```
+
+The species-specific model and species-temperature interaction model are not statistically significantly different with a p-value greater than 0.05. Therefore, we can rely on the species-specific model for prediction about chirp rates.
