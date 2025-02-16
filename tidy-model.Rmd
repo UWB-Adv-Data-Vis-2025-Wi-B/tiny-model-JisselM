@@ -116,6 +116,15 @@ ggplot(diamonds, aes(x = price)) +
 Summary: 
 5 cuts, minimum carat - 0.2 and max carat - 5.01, mean price of 3933
 
+## carat affects diamond price
 
+```{r carat, echo = FALSE}
+ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_point() + 
+  geom_smooth(method = 'lm') +
+  ggtitle("Plot of carat(s) and diamond price") +
+  ylab('Diamond price') +
+  xlab('Carat(s)')
+```
 
-
+Based on the scatter plot, as carats increase, diamond price increases. 
