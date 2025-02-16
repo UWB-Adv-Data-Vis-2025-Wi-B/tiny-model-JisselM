@@ -103,5 +103,19 @@ library(ggplot2)
 data("diamonds")
 ```
 
+We will now examine what factors determine a diamond's worth. 
+
+```{r diamondSummary, echo = FALSE}
+summary(diamonds)
+ggplot(diamonds, aes(x = price)) + 
+  geom_histogram(bins = 8) + 
+  ggtitle("Distribution of the price range of diamonds") + 
+  xlab('diamond price')
+```
+
+Summary: 
+5 cuts, minimum carat - 0.2 and max carat - 5.01, mean price of 3933
+
+
 
 
