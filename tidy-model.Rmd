@@ -1,0 +1,179 @@
+---
+title: "tidy-model"
+author: "Jissel Maldonado"
+date: "2025-02-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library('tidyverse') ; library('modeldata')
+```
+
+## Introduction
+
+This R Markdown document demonstrates my abilities to use models for data analysis using a dataset collected on crickets.
+
+```{r load data, include=FALSE}
+data(crickets, package = "modeldata")
+names(crickets)
+```
+
+## What is that sound? 
+
+In this report, we examine what factors predict a cricket's chirp rate. 
+
+```{r summary, echo = FALSE}
+summary(crickets)
+ggplot(crickets, aes(x = rate)) + 
+  geom_histogram(bins = 8) + 
+  ggtitle("Distribution of the chirp rate of crickets") + 
+  xlab('Chirp rate (per min.)')
+```
+
+Summary:
+
+Number of observations: 31 Number of species: 2 Temperature range: min of 17.20, max of 30.40 Mean rate of chirping: 72.89
+
+## Temperature affects chirp rate
+
+```{r temp, echo = FALSE}
+ggplot(crickets, aes(x = temp, y = rate)) +
+  geom_point() + 
+  geom_smooth(method = 'lm') +
+  ggtitle("Plot of temperature and chirp rate") + 
+  ylab('Chirp rate (per min.)') + 
+  xlab('Temperature (Celcius)')
+
+temp_lm <- lm(rate ~ temp, crickets)
+
+summary.lm(temp_lm)
+```
+
+Based on a scatter plot of temperature and chirping and a correlation test, it seems that as temperature increases one degree, the rate of chirping increases about 4.2 chirps per minute.
+
+## Species-specific effects of temperature on chirping
+
+```{r species, echo = FALSE}
+ggplot(crickets, aes(x = temp, y = rate, color = species)) + 
+  geom_point() + 
+  geom_smooth(method = 'lm') + 
+  ggtitle("Plot of temperature and chirp rate for two species of crickets") + 
+  ylab('Chirp rate (per min.)') + 
+  xlab('Temperature (Celcius)')
+
+species_lm <- lm(rate ~ temp + species, crickets)
+
+summary.lm(species_lm)
+```
+
+Based on the scatter plot of temperature, chirping, species, and a correlation test, it seems that as temperature increases one degree, the rate of chirping increases about 3.6 chirps per minute. O. exclamationis has a chirp rate 10 chirps per minute higher than O. niveus. Additionally, the model accounts for about 99% of the variance in the data. 
+
+## Interactions
+
+```{r species histogram, echo = FALSE}
+ggplot(crickets, aes(x = rate, fill = species)) + 
+  geom_histogram(position = 'identity', alpha = 0.7, bins = 8) + 
+  ggtitle("Distribution of the chirp rate of crickets") + 
+  xlab('Chirp rate (per min.)')
+```
+
+The O. exclamationis and O. niveus species occupy different temperature zones, which potentially impacts chirp rate.
+
+```{r interactions, echo = FALSE}
+ggplot(crickets, aes(x = temp, y = rate, color = species)) + 
+  geom_point() + 
+  geom_smooth(method = 'lm') + 
+  ggtitle("Plot of temperature and chirp rate for two species of crickets") + 
+  ylab('Chirp rate (per min.)') + 
+  xlab('Temperature (Celcius)')
+
+species_x_temp_lm <- lm(rate ~ temp + species + temp:species, crickets)
+summary.lm(species_x_temp_lm)
+
+anova(species_lm, species_x_temp_lm)
+```
+
+The species-specific model and species-temperature interaction model are not statistically significantly different with a p-value greater than 0.05. Therefore, we can rely on the species-specific model for prediction about chirp rates.
+
+## Visualize and model diamond worth using price, carat, and cut 
+```{r setup2, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+data("diamonds")
+```
+
+We will now examine what factors determine a diamond's worth. 
+
+```{r diamondSummary, echo = FALSE}
+summary(diamonds)
+ggplot(diamonds, aes(x = price)) + 
+  geom_histogram(bins = 8) + 
+  ggtitle("Distribution of the price range of diamonds") + 
+  xlab('diamond price')
+```
+
+Summary: 
+5 cuts, minimum carat - 0.2 and max carat - 5.01, mean price of 3933
+
+## carat affects diamond price
+
+```{r carat, echo = FALSE}
+ggplot(diamonds, aes(x = carat, y = price)) +
+  geom_point() + 
+  geom_smooth(method = 'lm') +
+  ggtitle("Plot of carat(s) and diamond price") +
+  ylab('Diamond price (in USD)') +
+  xlab('Carat(s)')
+
+carat_lm <- lm(price ~ carat, diamonds)
+summary.lm(carat_lm)
+```
+
+Based on the scatter plot, as the weight of the diamond increases by 1 carat, diamond price increases by about 7756 USD. 
+
+## cut-specific effects of carat(s) on price
+
+```{r cut, echo= FALSE}
+ggplot(diamonds, aes(x = carat, y = price, color = cut)) +
+  geom_point() + 
+  geom_smooth(method = 'lm') +
+  ggtitle("Plot of carat and diamond price for five cuts of diamond") +
+  ylab('Price (in USD)') +
+  xlab('Carat(s)')
+  
+contrasts(diamonds$cut) <- contr.treatment(5)
+cut_lm <- lm(price ~ carat + cut, diamonds)
+
+summary.lm(cut_lm)
+```
+
+Based on the scatter plot, as the weight of the diamond increases by 1 carat, diamond price increases by about 7871 USD. There is a price difference of about 1120 from fair to good, 1510 from fair to very good, 1439 from fair to premium, and 1800 from fair to ideal. This model accounts for about 85% of the variance in the data. 
+
+## Interactions between carat and cut in diamonds
+
+```{r cut histogram, echo = FALSE}
+summary(diamonds)
+ggplot(diamonds, aes(x = price, fill = cut)) + 
+  geom_histogram(position = 'identity', alpha = 0.7, bins = 8) + 
+  ggtitle("Distribution of the price range of diamonds") + 
+  xlab('diamond price')
+```
+
+Diamond cuts may be more prevalent in different carats, so the interaction of these two variables may potentially affect price. 
+
+```{r diamondInteractions, echo = FALSE}
+ggplot(diamonds, aes(x = carat, y = price, color = cut)) + 
+  geom_point() +
+  geom_smooth(method = 'lm') + 
+  ggtitle("Plot of carat and diamond price for five cut variations") + 
+  ylab('Price (USD)') + 
+  xlab('Carat(s)')
+
+cut_x_carat_lm <- lm(price ~ carat + cut + carat:cut, diamonds)
+summary.lm(cut_x_carat_lm)
+
+anova(cut_lm, cut_x_carat_lm)
+```
+
+The cut-specific model and cut-carat interaction model are statistically significantly different with a p-value less than 0.05. Therefore, we can rely on the cut-carat interaction model for prediction about diamond prices in USD.
